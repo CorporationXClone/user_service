@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import school.faang.user_service.dto.skill.SkillDto;
 import school.faang.user_service.entity.Skill;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class SkillMapperTest {
@@ -35,5 +37,34 @@ class SkillMapperTest {
         assertNotNull(skillEntity);
         assertEquals(1, skillEntity.getId());
         assertEquals("title", skillEntity.getTitle());
+    }
+
+    @Test
+    public void mapListToDto_checkCorrectWork() {
+        List<Skill> skills = createListSkills();
+
+        List<SkillDto> skillsDto = skillMapper.mapListToDto(skills);
+
+        assertNotNull(skillsDto);
+        assertEquals(3, skillsDto.size());
+
+        assertEquals(1L, skillsDto.get(0).getId());
+        assertEquals("title1", skillsDto.get(0).getTitle());
+    }
+
+    private List<Skill> createListSkills() {
+        Skill skill1 = Skill.builder()
+                .id(1L)
+                .title("title1")
+                .build();
+        Skill skill2 = Skill.builder()
+                .id(2L)
+                .title("title2")
+                .build();
+        Skill skill3 = Skill.builder()
+                .id(3L)
+                .title("title3")
+                .build();
+        return List.of(skill1, skill2, skill3);
     }
 }
