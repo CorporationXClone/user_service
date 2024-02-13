@@ -17,9 +17,9 @@ public interface SkillRepository extends JpaRepository<Skill, Long> {
     int countExisting(List<Long> ids);
 
     @Query(nativeQuery = true, value = """
-            SELECT * FROM skill s
+            SELECT s.* FROM skill s
             JOIN user_skill us ON s.id = us.skill_id
-            WHERE us.user_id = :userId;
+            WHERE us.user_id = :userId
             """)
     List<Skill> findAllByUserId(long userId);
 

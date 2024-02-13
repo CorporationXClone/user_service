@@ -26,7 +26,6 @@ public class SkillService {
         Skill skill = skillRepository.save(skillMapper.toEntity(skillDto));
         return skillMapper.toDto(skill);
     }
-
     public List<SkillDto> getUserSkills(long userId) {
         if (!userRepository.existsById(userId)) {
             throw new DataValidException("The user does not exist");
