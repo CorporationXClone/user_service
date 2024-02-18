@@ -22,7 +22,6 @@ public class SkillController {
     }
 
     @GetMapping("/user/{userId}")
-    @ResponseBody
     public List<SkillDto> getUserSkills(@PathVariable long userId) {
         return skillService.getUserSkills(userId);
     }
