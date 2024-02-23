@@ -25,25 +25,28 @@ public class SubscriptionService {
     private final UserMapper userMapper = UserMapper.INSTANCE;
 
     @Transactional
-    public List<UserDto> getFollowers(long followeeId, UserFilterDto filterDto){
-        if(!userRepository.existsById(followeeId)){
-            throw new DataValidException(String.format("The user with id %d not exists", followeeId));
-        }
-
-        List<User> users = subscriptionRepository.findByFolloweeId(followeeId);
-
-        return filters(users.stream(), filterDto);
+    public List<UserDto> getFollowers(long followeeId, UserFilterDto filterDto) {
+        validOnExistUser(followeeId);
+        return filters(subscriptionRepository.findByFolloweeId(followeeId), filterDto);
     }
 
-    private List<UserDto> filters(Stream<User> users, UserFilterDto filterDto){
-        List<UserDto> usersList = userFilters.stream()
+    private List<UserDto> filters(Stream<User> users, UserFilterDto filterDto) {
+        if (userFilters.stream().noneMatch(filter -> filter.isApplicable(filterDto))) {
+            return users.map(userMapper::toDto).toList();
+        }
+
+        return userFilters.stream()
                 .filter(filter -> filter.isApplicable(filterDto))
                 .flatMap(filter -> filter.apply(users, filterDto))
                 .skip(filterDto.getPage() > 0 ? (long) (filterDto.getPage() - 1) * filterDto.getPageSize() : 0)
                 .limit(filterDto.getPage() > 0 && filterDto.getPageSize() > 0 ? filterDto.getPageSize() : Long.MAX_VALUE)
                 .map(userMapper::toDto)
                 .toList();
+    }
 
-        return usersList;
+    private void validOnExistUser(long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new DataValidException(String.format("The user with ID %d not exists", userId));
+        }
     }
 }

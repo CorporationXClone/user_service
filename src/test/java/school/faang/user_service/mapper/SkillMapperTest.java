@@ -41,7 +41,7 @@ class SkillMapperTest {
 
     @Test
     public void mapListToDto_checkCorrectWork() {
-        List<Skill> skills = createListSkills();
+        List<Skill> skills = createListSkillsEntity();
 
         List<SkillDto> skillsDto = skillMapper.mapListToDto(skills);
 
@@ -52,7 +52,7 @@ class SkillMapperTest {
         assertEquals("title1", skillsDto.get(0).getTitle());
     }
 
-    private List<Skill> createListSkills() {
+    private List<Skill> createListSkillsEntity() {
         Skill skill1 = Skill.builder()
                 .id(1L)
                 .title("title1")

@@ -16,7 +16,7 @@ public class SubscriptionController {
     private final SubscriptionService subscriptionService;
 
     @PostMapping("/followers/{followeeId}")
-    public List<UserDto> getFollowers(@PathVariable long followeeId,@Valid UserFilterDto filtersDto){
+    public List<UserDto> getFollowers(@PathVariable long followeeId,@Valid @RequestBody UserFilterDto filtersDto){
         return subscriptionService.getFollowers(followeeId, filtersDto);
     }
 }
