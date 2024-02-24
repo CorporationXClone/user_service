@@ -67,6 +67,7 @@ CREATE TABLE user_skill (
     id bigint PRIMARY KEY GENERATED ALWAYS AS IDENTITY UNIQUE,
     user_id bigint NOT NULL,
     skill_id bigint NOT NULL,
+    offers_amount bigint NOT NULL DEFAULT 0,
     created_at timestamptz DEFAULT current_timestamp,
     updated_at timestamptz DEFAULT current_timestamp,
 
