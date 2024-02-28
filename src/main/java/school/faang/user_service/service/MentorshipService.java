@@ -2,6 +2,7 @@ package school.faang.user_service.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import school.faang.user_service.dto.skill.UserDto;
 import school.faang.user_service.entity.User;
 import school.faang.user_service.exception.DataValidException;
@@ -23,6 +24,32 @@ public class MentorshipService {
 
         List<User> mentees = mentorshipRepository.getMenteesByMentorId(mentorId);
         return mentees.stream().map(userMapper::toDto).toList();
+    }
+
+    @Transactional
+    public void deleteMentor(long mentorId, long menteeId) {
+        validationUser(mentorId);
+        validationUser(menteeId);
+
+        checkMentorship(mentorId, menteeId);
+
+        mentorshipRepository.deleteMentorFromMentee(mentorId, menteeId);
+    }
+
+    @Transactional
+    public void deleteMentee(long menteeId, long mentorId) {
+        validationUser(menteeId);
+        validationUser(mentorId);
+
+        checkMentorship(mentorId, menteeId);
+
+        mentorshipRepository.deleteMenteeFromMentor(menteeId, mentorId);
+    }
+
+    private void checkMentorship(long mentorId, long menteeId) {
+        if (!mentorshipRepository.existsByMentorIdAndMenteeId(mentorId, menteeId)) {
+            throw new DataValidException("There is no such mentoring relationship");
+        }
     }
 
     private void validationUser(long userId) {

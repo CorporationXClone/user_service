@@ -15,6 +15,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class MentorshipServiceTest {
@@ -44,6 +45,86 @@ class MentorshipServiceTest {
         when(userRepository.existsById(1L)).thenReturn(false);
 
         assertThrows(DataValidException.class, () -> mentorshipService.getMentees(1L));
+    }
+
+    @Test
+    public void deleteMentor_checkCorrectWork() {
+        when(userRepository.existsById(1L)).thenReturn(true);
+        when(userRepository.existsById(2L)).thenReturn(true);
+
+        when(mentorshipRepository.existsByMentorIdAndMenteeId(1L, 2L)).thenReturn(true);
+
+        mentorshipService.deleteMentor(1L, 2L);
+
+        verify(mentorshipRepository).deleteMentorFromMentee(1L, 2L);
+    }
+
+    @Test
+    public void deleteMentor_ifMentorNotExists() {
+        when(userRepository.existsById(1L)).thenReturn(false);
+
+        assertThrows(DataValidException.class, () -> mentorshipService.deleteMentor(1L, 2L));
+    }
+
+    @Test
+    public void deleteMentor_ifMenteeNotExists() {
+        when(userRepository.existsById(1L)).thenReturn(true);
+        when(userRepository.existsById(2L)).thenReturn(false);
+
+        assertThrows(DataValidException.class, () -> mentorshipService.deleteMentor(1L, 2L));
+    }
+
+    @Test
+    public void deleteMentor_ifRelationshipNotExists() {
+        when(userRepository.existsById(1L)).thenReturn(true);
+        when(userRepository.existsById(2L)).thenReturn(true);
+
+        when(mentorshipRepository.existsByMentorIdAndMenteeId(1L, 2L)).thenReturn(false);
+
+        DataValidException exception = assertThrows(DataValidException.class,
+                () -> mentorshipService.deleteMentor(1L, 2L));
+
+        assertEquals("There is no such mentoring relationship", exception.getMessage());
+    }
+
+    @Test
+    public void deleteMentee_checkCorrectWork() {
+        when(userRepository.existsById(1L)).thenReturn(true);
+        when(userRepository.existsById(2L)).thenReturn(true);
+
+        when(mentorshipRepository.existsByMentorIdAndMenteeId(1L, 2L)).thenReturn(true);
+
+        mentorshipService.deleteMentee(2L, 1L);
+
+        verify(mentorshipRepository).deleteMenteeFromMentor(2L, 1L);
+    }
+
+    @Test
+    public void deleteMentee_ifMenteeNotExists() {
+        when(userRepository.existsById(2L)).thenReturn(false);
+
+        assertThrows(DataValidException.class, () -> mentorshipService.deleteMentee(2L, 1L));
+    }
+
+    @Test
+    public void deleteMentee_ifMentorNotExists() {
+        when(userRepository.existsById(2L)).thenReturn(true);
+        when(userRepository.existsById(1L)).thenReturn(false);
+
+        assertThrows(DataValidException.class, () -> mentorshipService.deleteMentee(2L, 1L));
+    }
+
+    @Test
+    public void deleteMentee_ifRelationshipNotExists() {
+        when(userRepository.existsById(1L)).thenReturn(true);
+        when(userRepository.existsById(2L)).thenReturn(true);
+
+        when(mentorshipRepository.existsByMentorIdAndMenteeId(1L, 2L)).thenReturn(false);
+
+        DataValidException exception = assertThrows(DataValidException.class,
+                () -> mentorshipService.deleteMentee(2L, 1L));
+
+        assertEquals("There is no such mentoring relationship", exception.getMessage());
     }
 
     private List<User> createMentees() {
